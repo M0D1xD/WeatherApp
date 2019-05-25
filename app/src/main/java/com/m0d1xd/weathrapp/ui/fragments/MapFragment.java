@@ -2,8 +2,10 @@ package com.m0d1xd.weathrapp.ui.fragments;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -17,6 +19,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,6 +35,9 @@ import com.m0d1xd.weathrapp.MainActivity;
 import com.m0d1xd.weathrapp.R;
 import com.m0d1xd.weathrapp.model.WeatherApi.City;
 import com.m0d1xd.weathrapp.model.WeatherApi.WeatherResponse;
+import com.squareup.picasso.Picasso;
+
+import java.text.DecimalFormat;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -143,7 +151,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public View getInfoContents(Marker marker) {
-        return null;
+        return prepareInfoView(marker);
     }
 
     @Override
@@ -160,5 +168,53 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         mGoogleMap.setOnInfoWindowClickListener(this);
         mGoogleMap.setInfoWindowAdapter(this);
         setUpMarkers(mGoogleMap);
+    }
+
+    @SuppressLint({"SetTextI18n", "ResourceAsColor"})
+    private View prepareInfoView(Marker marker) {
+
+        City city = (City) marker.getTag();
+        if (marker.getTitle().equals(getString(R.string.text_search))) {
+            return null;
+        }
+
+        LinearLayout infoView = new LinearLayout(getContext());
+        LinearLayout.LayoutParams infoViewParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        infoView.setOrientation(LinearLayout.HORIZONTAL);
+        infoView.setLayoutParams(infoViewParams);
+
+        ImageView infoImageView = new ImageView(getContext());
+        Drawable drawable = getResources().getDrawable(android.R.drawable.ic_dialog_map);
+        if (city.getWeather().get(0).getIcon() != null)
+            Picasso.get().load(city.getWeather().get(0).getIcon()).placeholder(drawable).into(infoImageView);
+
+        infoView.addView(infoImageView);
+
+        LinearLayout subInfoView = new LinearLayout(getContext());
+        LinearLayout.LayoutParams subInfoViewParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        subInfoView.setOrientation(LinearLayout.VERTICAL);
+        subInfoView.setLayoutParams(subInfoViewParams);
+
+        TextView subInfoLat = new TextView(getContext());
+        subInfoLat.setText(city.getName());
+        subInfoLat.setTextColor(R.color.colorAccent);
+        TextView subInfoLnt = new TextView(getContext());
+
+        subInfoLnt.setText(ConvertKtoC(city.getMain().getTemp()) + "°C");
+        subInfoLnt.setTextColor(R.color.colorAccent);
+
+        subInfoView.addView(subInfoLat);
+        subInfoView.addView(subInfoLnt);
+        infoView.addView(subInfoView);
+
+        return infoView;
+    }
+
+    private Double ConvertKtoC(double Kelvin) {
+        DecimalFormat decimalFormat = new DecimalFormat("##.##");
+        String formatResult = decimalFormat.format((Kelvin - 273.15));
+        return Double.parseDouble(formatResult);
     }
 }
