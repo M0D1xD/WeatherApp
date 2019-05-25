@@ -24,9 +24,4 @@ public class TempViewHolder extends ChildViewHolder {
         tv_current.setText(temperature.toString());
     }
 
-    private Double ConvertKtoC(double Kelvin) {
-        DecimalFormat decimalFormat = new DecimalFormat("##.##");
-        String formatResult = decimalFormat.format((Kelvin - 273.15));
-        return Double.parseDouble(formatResult);
-    }
 }

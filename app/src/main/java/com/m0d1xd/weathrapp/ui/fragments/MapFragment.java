@@ -45,6 +45,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.m0d1xd.weathrapp.util.Constants.ConvertKtoC;
+
 
 public class MapFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnInfoWindowClickListener, GoogleMap.InfoWindowAdapter {
@@ -238,11 +240,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         return infoView;
     }
 
-    private Double ConvertKtoC(double Kelvin) {
-        DecimalFormat decimalFormat = new DecimalFormat("##.##");
-        String formatResult = decimalFormat.format((Kelvin - 273.15));
-        return Double.parseDouble(formatResult);
-    }
 
     void SearchArea(Marker marker) {
 
