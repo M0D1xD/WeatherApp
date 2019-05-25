@@ -1,5 +1,6 @@
 package com.m0d1xd.weathrapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.navigation.NavController;
@@ -11,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -35,6 +37,22 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         navController = Navigation.findNavController(this, R.id.fragment);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.nav_map:
+                        navController.navigate(R.id.action_map);
+                        break;
+                    case R.id.nav_cities:
+                        navController.navigate(R.id.action_cities);
+                        break;
+                }
+                return true;
+            }
+        });
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},

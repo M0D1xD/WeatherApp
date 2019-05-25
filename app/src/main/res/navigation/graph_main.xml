@@ -11,10 +11,10 @@
         android:label="fragment_map"
         tools:layout="@layout/fragment_map" >
         <action
-            android:id="@+id/action_mapFragment_to_citiesFragment"
+            android:id="@+id/action_cities"
             app:destination="@id/citiesFragment" />
         <action
-            android:id="@+id/action_mapFragment_self"
+            android:id="@+id/action_map"
             app:destination="@id/mapFragment" />
     </fragment>
     <fragment
@@ -23,10 +23,10 @@
         android:label="fragment_cities"
         tools:layout="@layout/fragment_cities" >
         <action
-            android:id="@+id/action_citiesFragment_self"
+            android:id="@+id/action_cities"
             app:destination="@id/citiesFragment" />
         <action
-            android:id="@+id/action_citiesFragment_to_mapFragment"
+            android:id="@+id/action_map"
             app:destination="@id/mapFragment" />
     </fragment>
 </navigation>
