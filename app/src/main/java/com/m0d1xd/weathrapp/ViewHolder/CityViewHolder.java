@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.m0d1xd.weathrapp.R;
 import com.m0d1xd.weathrapp.model.WeatherApi.City;
+import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder;
 
 import static android.view.animation.Animation.RELATIVE_TO_SELF;
@@ -22,8 +23,8 @@ public class CityViewHolder extends GroupViewHolder {
         arrow = itemView.findViewById(R.id.arrow);
     }
 
-    public void Bind(City city) {
-        tv_city_name.setText(city.getName());
+    public void Bind(ExpandableGroup city) {
+        tv_city_name.setText(city.getTitle());
     }
 
     @Override
