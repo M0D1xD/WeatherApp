@@ -28,6 +28,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -54,6 +55,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     private Call<WeatherResponse> call;
 
     private static final int CITIES_COUNT = 20;
+    private Marker marker; //reference to the search marker
 
     public MapFragment() {
         // Required empty public constructor
@@ -83,8 +85,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void setUpMarkers(final GoogleMap mGoogleMap) {
-
-
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
                 (getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -156,17 +156,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-
+        SearchArea(marker);
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
         MapsInitializer.initialize(getView().getContext());
         mGoogleMap = googleMap;
         mGoogleMap.setOnInfoWindowClickListener(this);
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mGoogleMap.setOnInfoWindowClickListener(this);
         mGoogleMap.setInfoWindowAdapter(this);
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if (marker != null) { //if marker exists (not null or whatever)
+                    marker.setPosition(latLng);
+                } else {
+                    marker = googleMap.addMarker(new MarkerOptions()
+                            .position(latLng)
+                            .title(getString(R.string.text_search))
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_search_weather))
+                            .draggable(true));
+                }
+            }
+        });
         setUpMarkers(mGoogleMap);
     }
 
@@ -216,5 +230,41 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         DecimalFormat decimalFormat = new DecimalFormat("##.##");
         String formatResult = decimalFormat.format((Kelvin - 273.15));
         return Double.parseDouble(formatResult);
+    }
+
+    void SearchArea(Marker marker) {
+        if (marker.getTitle().equals(getString(R.string.text_search))) {
+            MainActivity.latitude = marker.getPosition().latitude;
+            MainActivity.longitude = marker.getPosition().longitude;
+            Call<WeatherResponse> call = MainActivity.mServices.getWeather(getResources()
+                            .getString(R.string.weather_api),
+                    String.valueOf(marker.getPosition().latitude),
+                    String.valueOf(marker.getPosition().longitude),
+                    20);
+            call.enqueue(new Callback<WeatherResponse>() {
+                @Override
+                public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
+                    if (response.isSuccessful()) {
+                        mGoogleMap.clear();
+                        MainActivity.Cities = response.body().getList();
+                        if (MainActivity.Cities != null) {
+                            for (City city : MainActivity.Cities) {
+                                LatLng Coords = new LatLng(city.getCoord().getLat(), city.getCoord().getLon());
+                                mGoogleMap.addMarker(new MarkerOptions().position(Coords).title(city.getName())).setTag(city);
+                                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(Coords));
+                                mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "onResponse: " + response.message());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<WeatherResponse> call, Throwable t) {
+                    Log.d(TAG, "onFailure: " + t.getMessage());
+                }
+            });
+        }
     }
 }
