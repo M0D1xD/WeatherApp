@@ -3,4 +3,6 @@
 
     <string name="tab_text_1">Map</string>
     <string name="tab_text_2">Cities</string>
+
+    <string name="weather_api">API_KEY</string>
 </resources>
