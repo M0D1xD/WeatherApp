@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/graph_main">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_main"
+    app:startDestination="@id/mapFragment">
 
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.m0d1xd.weathrapp.ui.fragments.MapFragment"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map" >
+        <action
+            android:id="@+id/action_mapFragment_to_citiesFragment"
+            app:destination="@id/citiesFragment" />
+        <action
+            android:id="@+id/action_mapFragment_self"
+            app:destination="@id/mapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/citiesFragment"
+        android:name="com.m0d1xd.weathrapp.ui.fragments.CitiesFragment"
+        android:label="fragment_cities"
+        tools:layout="@layout/fragment_cities" >
+        <action
+            android:id="@+id/action_citiesFragment_self"
+            app:destination="@id/citiesFragment" />
+        <action
+            android:id="@+id/action_citiesFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
 </navigation>
