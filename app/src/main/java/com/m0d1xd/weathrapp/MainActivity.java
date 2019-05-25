@@ -8,11 +8,8 @@ import androidx.navigation.Navigation;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -21,7 +18,6 @@ import com.m0d1xd.weathrapp.Remote.WeatherService;
 import com.m0d1xd.weathrapp.model.WeatherApi.City;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.m0d1xd.weathrapp.util.Constants.CITY_LIST;
 import static com.m0d1xd.weathrapp.util.Constants.LAST_COORD_LAT;
@@ -46,23 +42,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (savedInstanceState != null) {
             latitude = savedInstanceState.getDouble(LAST_COORD_LAT);
             longitude = savedInstanceState.getDouble(LAST_COORD_LON);
             Cities = savedInstanceState.getParcelableArrayList(CITY_LIST);
-        } else
-            initViews();
+        } else {
+            RequestPermission();
+        }
 
-    }
-
-    private void initViews() {
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         navController = Navigation.findNavController(this, R.id.fragment);
         mServices = RetrofitInstance.getRetrofitInstance();
-        ActivityCompat.requestPermissions(MainActivity.this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                REQUEST_LOCATION);
+
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -78,7 +70,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
 
+    private void RequestPermission() {
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                REQUEST_LOCATION);
     }
 
     @Override
