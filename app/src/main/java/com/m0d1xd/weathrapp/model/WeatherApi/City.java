@@ -5,10 +5,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
+import com.m0d1xd.weathrapp.model.custom.Temperature;
+import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
 import java.util.List;
 
-public class City implements Parcelable {
+public class City extends ExpandableGroup<Temperature> {
     @SerializedName("id")
     private Integer id;
     @SerializedName("name")
@@ -32,32 +34,10 @@ public class City implements Parcelable {
     @SerializedName("weather")
     private List<Weather> weather = null;
 
-    protected City(Parcel in) {
-        if (in.readByte() == 0) {
-            id = null;
-        } else {
-            id = in.readInt();
-        }
-        name = in.readString();
-        main = in.readParcelable(Main.class.getClassLoader());
-        if (in.readByte() == 0) {
-            dt = null;
-        } else {
-            dt = in.readInt();
-        }
+    public City(String title, List<Temperature> items) {
+        super(title, items);
     }
 
-    public static final Creator<City> CREATOR = new Creator<City>() {
-        @Override
-        public City createFromParcel(Parcel in) {
-            return new City(in);
-        }
-
-        @Override
-        public City[] newArray(int size) {
-            return new City[size];
-        }
-    };
 
     public Integer getId() {
         return id;
