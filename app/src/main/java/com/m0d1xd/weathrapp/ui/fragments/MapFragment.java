@@ -11,12 +11,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.m0d1xd.weathrapp.MainActivity;
 import com.m0d1xd.weathrapp.R;
+import com.m0d1xd.weathrapp.model.WeatherApi.City;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback,
@@ -48,6 +53,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             mMapView.onResume();
             mMapView.getMapAsync(this);
         }
+        if (mGoogleMap != null)
+            setUpMarkers(mGoogleMap);
+
+    }
+
+    private void setUpMarkers(GoogleMap mGoogleMap) {
+        mGoogleMap.clear();
+        LatLng point = new LatLng(MainActivity.latitude, MainActivity.longitude);
+        mGoogleMap.addMarker(new MarkerOptions().position(point).title("Rostov On Don"));
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(point));
+        mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+        if (MainActivity.Cities != null) {
+            for (City city : MainActivity.Cities) {
+                LatLng Coords = new LatLng(city.getCoord().getLat(), city.getCoord().getLon());
+                mGoogleMap.addMarker(new MarkerOptions().position(Coords).title(city.getName())).setTag(city);
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(Coords));
+                mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+            }
+        }
     }
 
     @Override
@@ -73,5 +97,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mGoogleMap.setOnInfoWindowClickListener(this);
         mGoogleMap.setInfoWindowAdapter(this);
+        setUpMarkers(mGoogleMap);
     }
 }
