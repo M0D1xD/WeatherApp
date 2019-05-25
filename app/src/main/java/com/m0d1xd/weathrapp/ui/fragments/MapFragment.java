@@ -39,6 +39,7 @@ import com.m0d1xd.weathrapp.model.WeatherApi.WeatherResponse;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,7 +56,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     private Call<WeatherResponse> call;
 
     private static final int CITIES_COUNT = 20;
-    private Marker marker; //reference to the search marker
+    private static Marker marker; //reference to the search marker
 
     public MapFragment() {
         // Required empty public constructor
@@ -156,7 +157,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        SearchArea(marker);
+        if (marker.getTitle().equals(getString(R.string.text_search)))
+            SearchArea(marker);
     }
 
     @Override
@@ -233,38 +235,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     }
 
     void SearchArea(Marker marker) {
-        if (marker.getTitle().equals(getString(R.string.text_search))) {
-            MainActivity.latitude = marker.getPosition().latitude;
-            MainActivity.longitude = marker.getPosition().longitude;
-            Call<WeatherResponse> call = MainActivity.mServices.getWeather(getResources()
-                            .getString(R.string.weather_api),
-                    String.valueOf(marker.getPosition().latitude),
-                    String.valueOf(marker.getPosition().longitude),
-                    20);
-            call.enqueue(new Callback<WeatherResponse>() {
-                @Override
-                public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
-                    if (response.isSuccessful()) {
-                        mGoogleMap.clear();
-                        MainActivity.Cities = response.body().getList();
-                        if (MainActivity.Cities != null) {
-                            for (City city : MainActivity.Cities) {
-                                LatLng Coords = new LatLng(city.getCoord().getLat(), city.getCoord().getLon());
-                                mGoogleMap.addMarker(new MarkerOptions().position(Coords).title(city.getName())).setTag(city);
-                                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(Coords));
-                                mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
-                            }
-                        }
-                    } else {
-                        Log.d(TAG, "onResponse: " + response.message());
-                    }
-                }
 
-                @Override
-                public void onFailure(Call<WeatherResponse> call, Throwable t) {
-                    Log.d(TAG, "onFailure: " + t.getMessage());
+        MainActivity.latitude = marker.getPosition().latitude;
+        MainActivity.longitude = marker.getPosition().longitude;
+        MapFragment.marker = null;
+        Call<WeatherResponse> call = MainActivity.mServices.getWeather(getResources()
+                        .getString(R.string.weather_api),
+                String.valueOf(MainActivity.latitude),
+                String.valueOf(MainActivity.longitude),
+                CITIES_COUNT);
+        call.enqueue(new Callback<WeatherResponse>() {
+            @Override
+            public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
+                if (response.isSuccessful()) {
+                    mGoogleMap.clear();
+                    MainActivity.Cities = (ArrayList<City>) response.body().getList();
+                    if (MainActivity.Cities != null) {
+                        for (City city : MainActivity.Cities) {
+                            LatLng Coords = new LatLng(city.getCoord().getLat(), city.getCoord().getLon());
+                            mGoogleMap.addMarker(new MarkerOptions().position(Coords).title(city.getName())).setTag(city);
+                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(Coords));
+                            mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "onResponse: " + response.message());
                 }
-            });
-        }
+            }
+
+            @Override
+            public void onFailure(Call<WeatherResponse> call, Throwable t) {
+                Log.d(TAG, "onFailure: " + t.getMessage());
+            }
+        });
     }
 }
