@@ -20,7 +20,12 @@ import com.m0d1xd.weathrapp.Remote.RetrofitInstance;
 import com.m0d1xd.weathrapp.Remote.WeatherService;
 import com.m0d1xd.weathrapp.model.WeatherApi.City;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.m0d1xd.weathrapp.util.Constants.CITY_LIST;
+import static com.m0d1xd.weathrapp.util.Constants.LAST_COORD_LAT;
+import static com.m0d1xd.weathrapp.util.Constants.LAST_COORD_LON;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,15 +40,20 @@ public class MainActivity extends AppCompatActivity {
     private NavController navController;
 
     public static WeatherService mServices;
-    public static List<City> Cities;
+    public static ArrayList<City> Cities;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (savedInstanceState != null) {
+            latitude = savedInstanceState.getDouble(LAST_COORD_LAT);
+            longitude = savedInstanceState.getDouble(LAST_COORD_LON);
+            Cities = savedInstanceState.getParcelableArrayList(CITY_LIST);
+        } else
             initViews();
-        }
+
     }
 
     private void initViews() {
@@ -71,5 +81,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Cities = savedInstanceState.getParcelableArrayList(CITY_LIST);
+        longitude = savedInstanceState.getDouble(LAST_COORD_LON);
+        latitude = savedInstanceState.getDouble(LAST_COORD_LAT);
 
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(CITY_LIST, Cities);
+        outState.putDouble(LAST_COORD_LAT, latitude);
+        outState.putDouble(LAST_COORD_LON, longitude);
+    }
 }
