@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_LOCATION = 1;
     private static final int CITIES_COUNT = 20;
     private LocationManager locationManager;
+    private static final String TAG = "MainActivity";
 
     public static Double latitude, longitude;
 
@@ -107,13 +108,15 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
 
-                    if (response.isSuccessful() && response.body() != null) {
+                    if (response.isSuccessful()) {
                         if (response.body().getCode().equals("200")) {
                             Cities = response.body().getList();
                         } else {
                             Log.d(TAG, "onResponse: " + response.body().getCode());
-                            Log.d(TAG, "onResponse: " + response.body().getMessage());
                         }
+                    } else {
+                        Log.d(TAG, "onResponse: " + response.body().getCode());
+                        Log.d(TAG, "onResponse: " + response.body().getMessage());
                     }
                 }
 
