@@ -5,4 +5,5 @@
     <string name="tab_text_2">Cities</string>
 
     <string name="weather_api">API_KEY</string>
+    <string name="google_maps_api">GOOGLE_API_KEY</string>
 </resources>
