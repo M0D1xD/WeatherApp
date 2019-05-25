@@ -1,10 +1,14 @@
 package com.m0d1xd.weathrapp.model.WeatherApi;
 
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class City {
+public class City implements Parcelable {
     @SerializedName("id")
     private Integer id;
     @SerializedName("name")
@@ -27,6 +31,33 @@ public class City {
     private Clouds clouds;
     @SerializedName("weather")
     private List<Weather> weather = null;
+
+    protected City(Parcel in) {
+        if (in.readByte() == 0) {
+            id = null;
+        } else {
+            id = in.readInt();
+        }
+        name = in.readString();
+        main = in.readParcelable(Main.class.getClassLoader());
+        if (in.readByte() == 0) {
+            dt = null;
+        } else {
+            dt = in.readInt();
+        }
+    }
+
+    public static final Creator<City> CREATOR = new Creator<City>() {
+        @Override
+        public City createFromParcel(Parcel in) {
+            return new City(in);
+        }
+
+        @Override
+        public City[] newArray(int size) {
+            return new City[size];
+        }
+    };
 
     public Integer getId() {
         return id;
@@ -131,5 +162,28 @@ public class City {
                 ", clouds=" + clouds +
                 ", weather=" + weather +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (id == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(id);
+        }
+        dest.writeString(name);
+        dest.writeParcelable(main, flags);
+        if (dt == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(dt);
+        }
     }
 }
