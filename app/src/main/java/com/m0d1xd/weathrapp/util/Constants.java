@@ -1,6 +1,5 @@
 package com.m0d1xd.weathrapp.util;
 
-import java.text.DecimalFormat;
 
 public class Constants {
     public static final String CITY_LIST = "city_list";
@@ -8,8 +7,17 @@ public class Constants {
     public static final String LAST_COORD_LON = "lon";
 
     public static Double ConvertKtoC(double Kelvin) {
-        DecimalFormat decimalFormat = new DecimalFormat("##.##");
-        String formatResult = decimalFormat.format((Kelvin - 273.15));
-        return Double.parseDouble(formatResult);
+        long p = pow(10, 2);
+        long l = (long) ((Kelvin - 273.15) * p);
+        return (double) l / (double) p;
+    }
+
+
+    private static long pow(long a, int b) {
+        long result = 1;
+        for (int i = 1; i <= b; i++) {
+            result *= a;
+        }
+        return result;
     }
 }
