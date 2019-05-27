@@ -91,8 +91,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(CITY_LIST, Cities);
-        outState.putDouble(LAST_COORD_LAT, latitude);
-        outState.putDouble(LAST_COORD_LON, longitude);
+        if (outState != null) {
+            outState.putParcelableArrayList(CITY_LIST, Cities);
+            outState.putDouble(LAST_COORD_LAT, latitude);
+            outState.putDouble(LAST_COORD_LON, longitude);
+        }
     }
 }
